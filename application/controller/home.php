@@ -25,4 +25,18 @@ class Home extends Controller
         // load views
         require APP . 'view/home/about.php';
     }
+    public function registrarMascotas(){
+        //Load views
+        require APP . 'view/mascotas/registrarMascota.php';
+    }
+    public function errorMascotaLogin(){
+        //Load views
+        require APP . 'view/home/errorMascotaLogin.php';
+    }
+    public function volverAdmin(){
+        require APP . 'view/home/indexAdmin.php';
+    }
+    public function volverUsuario(){
+        require APP . 'view/home/indexUsuario.php';
+    }
 }

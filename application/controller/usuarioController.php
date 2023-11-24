@@ -3,21 +3,16 @@
 class usuarioController extends Controller{
     //atributos
     private $modeloU;
+    private $modeloM;
 
     //crear el constructor
     public function __construct(){
         //instaciar los modelos
         $this->modeloU= $this->loadModel("mdlUsuario");
+        $this->modeloM= $this->loadModel("mdlMascota");
+        
     }
-    //Metodo para vista de creacion de mascota
-    public function vista(){
-        $error = false;
-        if($_SESSION['SESSION INICIADA'] = true){
-            require APP . 'view/home/registrarMascota.php';
-        }else{
-            require APP . 'view/home/errorMascotaLogin.php';
-        }
-    }
+   
 
     //método para iniciar sesión
     public function iniciar(){
@@ -44,8 +39,9 @@ class usuarioController extends Controller{
                 $_SESSION['Usuario'] = $validar['Usuario'];
                 $_SESSION['Descripcion'] = $validar['Descripcion'];
                 //después de la validación cargar el admin
-                
-                require APP . 'view/home/indexAdmin.php';
+              
+                $admin = require APP . 'view/home/indexAdmin.php';
+                echo $admin;
                 exit();
             }else if($validar2 == true){
                 $_SESSION['SESSION INICIADA'] = true;
@@ -56,18 +52,27 @@ class usuarioController extends Controller{
                 $_SESSION['Documento'] = $validar2['Documento'];
                 $_SESSION['Usuario'] = $validar2['Usuario'];
                 $_SESSION['Descripcion'] = $validar2['Descripcion'];
-                
-                require APP . 'view/home/indexUsuario.php';
+            
+                $usuario = require APP . 'view/home/indexUsuario.php';
+                echo $usuario;
                 exit();
+             
             
             }else{
-                echo "error";
-                require APP . 'view/usuarios/login.php';
+                echo "error2";
+                
+                return false;
             }
-        }
+        }else{
         
-        require APP . 'view/usuarios/login.php';
-        exit();
+            require APP . 'view/usuarios/login.php';
+            
+        }
+       
+        
+        
+        
+       
     }
 
     public function principal(){
@@ -232,6 +237,7 @@ class usuarioController extends Controller{
                     header("Location: ".URL."usuarioController/registrarUsuarioNoAdmin");
                     exit();
             }
+            
         }
 
         //variables para traer los demás métodos necesarios
@@ -244,33 +250,27 @@ class usuarioController extends Controller{
     }
     public function registrarMascota(){
         if(isset($_POST['btnGuardar'])){
-            $this->modeloU->__SET('idVacuna', $_POST['selVacuna']);
-            $this->modeloU->__SET('nombre', $_POST['txtNombre']);
-            $this->modeloU->__SET('raza', $_POST['txtRaza']);
-            $this->modeloU->__SET('tamaño', $_POST['txtTamaño']);
-            $this->modeloU->__SET('peso', $_POST['txtPeso']);
-            $this->modeloU->__SET('edad', $_POST['txtEdad']);
+            $this->modeloM->__SET('idVacunas', $_POST['selVacuna']);
+            $this->modeloM->__SET('nombre', $_POST['txtNombre']);
+            $this->modeloM->__SET('raza', $_POST['txtRaza']);
+            $this->modeloM->__SET('tamaño', $_POST['txtTamaño']);
+            $this->modeloM->__SET('peso', $_POST['txtPeso']);
+            $this->modeloM->__SET('edad', $_POST['txtEdad']);
+            $this->modeloM->__SET('sexo', $_POST['txtSexo']);
+            $this->modeloM->__SET('fecha', $_POST['txtFecha']);
 
-            $mascota = $this->modeloU->registrarMascota();
+            $mascota = $this->modeloM->registrarMascota();
 
             if($mascota == true){
-                $ultimoId = $this->modeloU->ultimoIdMascota();
+                $ultimoId = $this->modeloM->ultimoIdMascota();
                 foreach($ultimoId as $value){
                     $ultimoIdValue = $value['ultimoIdMascota'];
                 }
             }
 
-            //los datos para la tabla mascotas
-            $this->modeloU->__SET('idPersona', $ultimoIdValue);
-            $this->modeloU->__SET('usuario', $_POST['txtUsuario']);
-            $this->modeloU->__SET('clave', $_POST['txtClave']);
-            $this->modeloU->__SET('idRol', $_POST['selRoles']);
-
-            //variable para traer el método registrar del modelo
-            $usuario = $this->modeloU->registrarUsuarioNoAdmin();
 
             //aquí se agregará el código para el sweetalert2
-            if($persona == true && $usuario == true){
+            if($mascota == true && $usuario == true){
                 $_SESSION["alerta"] = "Swal.fire({
                     position: '',
                     icon: 'success',
@@ -288,19 +288,78 @@ class usuarioController extends Controller{
                     showConfirmButton: false,
                     timer:1500})";
 
-                    header("Location: ".URL."usuarioController/registrarUsuarioNoAdmin");
+                    header("Location: ".URL."usuarioController/registrarMascota");
                     exit();
             }
         }
+        
 
         //variables para traer los demás métodos necesarios
-        $roles = $this->modeloU->listarRoles();
-        $tipoDocumentos = $this->modeloU->listarTipoDocumento();
+        $usuario = $this->modeloU->listarUsuario();
+        $vacunas = $this->modeloM->listarVacunas();
 
         
-        require APP . 'view/usuarios/registrarUsuarioNoAdmin.php';
+        require APP . 'view/mascotas/registrarMascota.php';
         
     }
+    public function registrarMascotaAdmin(){
+        if(isset($_POST['btnGuardar'])){
+            $this->modeloM->__SET('idVacuna', $_POST['selVacuna']);
+            $this->modeloM->__SET('nombre', $_POST['txtNombre']);
+            $this->modeloM->__SET('raza', $_POST['txtRaza']);
+            $this->modeloM->__SET('tamaño', $_POST['txtTamaño']);
+            $this->modeloM->__SET('peso', $_POST['txtPeso']);
+            $this->modeloM->__SET('edad', $_POST['txtEdad']);
+            $this->modeloM->__SET('sexo', $_POST['txtSexo']);
+            $this->modeloM->__SET('fecha', $_POST['txtFecha']);
+
+            $mascota = $this->modeloM->registrarMascota();
+
+            if($mascota == true){
+                $ultimoId = $this->modeloM->ultimoIdMascota();
+                foreach($ultimoId as $value){
+                    $ultimoIdValue = $value['ultimoIdMascota'];
+                }
+            }
+
+
+            //aquí se agregará el código para el sweetalert2
+            if($mascota == true && $usuario == true){
+                $_SESSION["alerta"] = "Swal.fire({
+                    position: '',
+                    icon: 'success',
+                    title: 'Registro Exitoso',
+                    showConfirmButton: false,
+                    timer:1500})";
+
+                    header("Location: ".URL."home/index");
+                    exit();
+            }else{
+                $_SESSION["alerta"] = "Swal.fire({
+                    position: '',
+                    icon: 'error',
+                    title: 'Ocurrió un Error',
+                    showConfirmButton: false,
+                    timer:1500})";
+
+                    header("Location: ".URL."usuarioController/registrarMascotaAdmin");
+                    exit();
+            }
+      
+        }
+        
+
+        //variables para traer los demás métodos necesarios
+        $usuario = $this->modeloU->listarUsuarios();
+        $vacunas = $this->modeloM->listarVacunas();
+
+        
+        
+        require APP . 'view/_templates/header.php';
+        require APP . 'view/mascotas/registrarMascotaAdmin.php';
+        require APP . 'view/_templates/footer.php';
+    }
+    
 
 
     //función para traer el ID
